@@ -1,0 +1,384 @@
+#+title: Emacs Config
+#+author: kimothy
+#+roam_tags: emacs
+
+* Using Org-Babel for config of Emacs
+  To use org-babel and a .org file for confiuration is is required to set-up  org-babel in the .emacs file. With the correct set-up this .org file  will be tangled to a .el file, and the parsed by emacs to set the configuration  on startup. The benefit is that it's makes it easy to document the configuration  in detail.
+
+  To enable it add the following to the .emacs file.
+
+  #+begin_src emacs-lisp :exports none
+  ;(org-babel-load-file
+  ;    (expand-file-name
+  ;    "config.org"
+  ;    user-emacs-directory))
+  #+end_src
+
+* Installing Packages
+  To install packages in Emacs, package repos have to be added to
+  the /package-archives/. There are a few very well known repos
+  availible.
+
+  To download the repository metadata run (package-refresh-contents).
+  Then to install from the repose run (package-install)
+
+  Comment or uncomment the following lines to select the repos to use.
+
+  #+begin_src emacs-lisp :exports nil
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
+  (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
+  ;(add-to-list 'package-archives '("nongnu-devel" . "https://elpa.nongnu.org/nongnu-devel/"))
+  ;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+  #+end_src
+
+* Theming Emacs
+** Tweking window and frames
+   To increase the visuals of emacs it's possible to configure
+   the menu-bar, window fringes, scroll bars etc.
+   #+begin_src emacs-lisp
+     (scroll-bar-mode -1)
+     (fringe-mode -1)
+     (menu-bar-mode +1)
+   #+end_src
+
+** Loading a theme
+   #+begin_src emacs-lisp
+   (load-theme 'spacemacs-light)
+   #+end_src
+
+   #+RESULTS:
+   : t
+
+* Making Org-Mode look nice
+  Thanks a lot to zzamboni.org for a lot of the tricks described in this section. Much appreciated!
+** Pretty Bullets
+   The best package to that handels the bullets is
+   the org-bulletes package.
+
+   #+begin_src emacs-lisp
+   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+   #+end_src
+
+** Hiding Emphasis Markers
+   Hiding the emphasis markes helps to make formatet text such as /italic/ and *bold* easier to read.
+   The parameter ~org-hide-emphasis-markers~ can be used for this.
+
+   #+begin_src emacs-lisp
+   (setq org-hide-emphasis-markers t)
+   #+end_src
+
+** Using centered dots for list items
+   Another trick to improve the experience of org-mode is to use centered dots instead of the standard dashes.
+   This can be achived using font-locking.
+
+   #+begin_src emacs-lisp
+  (font-lock-add-keywords 'org-mode
+  '(("^ *\\([-]\\) "
+  (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+   #+end_src
+
+** Using proportional fonts for the headings
+   
+   #+begin_src emacs-lisp :exports nil
+    (let* ((variable-tuple
+    (cond
+		;((x-list-fonts "ETBembo")      '(:font "ETBembo"))
+		;((x-list-fonts "Deja Vu") '(:font "Deja Vu"))
+		;((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+		;((x-list-fonts "Verdana")         '(:font "Verdana"))
+		;((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+		(nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+         (base-font-color     (face-foreground 'default nil 'default))
+         (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+    (custom-theme-set-faces
+     'user
+     `(org-level-8 ((t (,@headline ,@variable-tuple))))
+     `(org-level-7 ((t (,@headline ,@variable-tuple))))
+     `(org-level-6 ((t (,@headline ,@variable-tuple))))
+     `(org-level-5 ((t (,@headline ,@variable-tuple))))
+     `(org-level-4 ((t (,@headline ,@variable-tuple :height 0.70))))
+     `(org-level-3 ((t (,@headline ,@variable-tuple :height 0.75))))
+     `(org-level-2 ((t (,@headline ,@variable-tuple :height 0.80))))
+     `(org-level-1 ((t (,@headline ,@variable-tuple :height 0.90))))
+     `(org-document-title ((t (,@headline ,@variable-tuple :height 1.0 :underline t))))))
+   #+end_src
+
+   #+RESULTS:
+
+   #+begin_src emacs-lisp
+  (custom-theme-set-faces
+   'user
+   '(variable-pitch ((t (:family "ETBembo" :height 180 :weight thin))))
+   '(fixed-pitch ((t ( :family "Fira Code Retina" :height 160)))))
+   #+end_src
+
+   #+RESULTS:
+
+   #+begin_src emacs-lisp
+   (add-hook 'org-mode-hook 'variable-pitch-mode)
+   #+end_src
+
+   #+begin_src emacs-lisp
+  (custom-theme-set-faces
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+   #+end_src
+
+   #+RESULTS:
+
+** Allow text to automatically flow
+   Allowing the automatic reflow of text will make it unecesary to break lines, which in turn  saves a lot of time refactorting text when making changes. The ~visual-line-mode~ can achive this.
+
+   #+begin_src emacs-lisp
+   (add-hook 'org-mode-hook 'visual-line-mode)
+   #+end_src
+
+   The visual-line-mode works well with the writeroom package, centering the text and limiting the colum width
+   
+** Creating a nice view
+   To have a nice writing an reading experience it's nice to have a limited width of the text, and also centering of the window contents. The ~writeroom-mode~ does a nice job with this and can be used with org-mode, and thus loading it with a hook on ~org-mode~ does the trick.
+
+#+begin_src emacs-lisp
+    (add-hook 'org-mode-hook 'writeroom-mode)
+#+end_src
+
+The ~writeroom-mode~ allows some configuration, that should be set before loading it, such as if it should start in full screen mode, the width etc. This can be tuned to liking. I prefer:
+
+- No full screen
+- Slighly wider then standard, since this works better with code blocks
+
+#+begin_src emacs-lisp
+  (setq writeroom-width 100)
+  (setq writeroom-fullscreen-effect nil)
+  (setq writeroom-maximize-window nil)
+#+end_src
+
+* Handeling back-up of files
+  As default emacs saves backup files in the same directory. To avoid clutter
+  it is possible to set-up a backup directory.
+  #+begin_src emacs-lisp
+    (setq backup-directory-alist `(("." . "~/.emacs.d/saves")))
+  #+end_src
+
+   
+  In addition it is possible to set-up how many copies that emacs should keep etc.
+  #+begin_src emacs-lisp
+    (setq delete-old-versions t
+       kept-new-versions 6
+       kept-old-versions 2
+       version-control t)
+  #+end_src
+
+* epa-file (encryption)
+  epa-file allows for seamless encryption and decryption of .gpg files.
+  #+begin_src emacs-lisp
+    (require 'epa-file)
+    (epa-file-enable)
+  #+end_src
+
+* Timers
+  :PROPERTIES:
+  :ID:       15e94f60-3291-47b0-8464-df7074d933c7
+  :END:
+  Emacs has an timer function that allows the execution of elisp functions
+  at specific time intervals. It can aslo be defined to run after idle time etc.
+
+  The ~run-with-timer~ takes three arguments.
+   
+  1. Time until first run in seconds
+  2. Time interval between each run after
+  3. The function to run
+
+  The timers will be configured within the relevant sections. To check which timers
+  that are active run.
+
+  #+begin_src elisp :exec never
+    ;(list-timers)
+  #+end_src
+
+  To allow the function to be run, activate it.
+  #+begin_src elisp
+    ;(put 'list-timers 'disabled nil)
+  #+end_src
+* Making files acessible
+  #+begin_src emacs-lisp
+    (require 'deft)
+    (setq deft-extensions '("txt" "tex" "org"))
+    (setq deft-directory "~/Documents/roam/")
+    (setq deft-recursive t)
+  #+end_src
+
+
+  #+begin_src emacs-lisp
+  (add-hook 'after-save-hook 'deft-refresh)
+  #+end_src
+
+* Custom Functions
+** Rename Current File
+  #+begin_src emacs-lisp
+  (defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+       (interactive)
+       (let ((name (buffer-name))
+       (filename (buffer-file-name)))
+       (if (not (and filename (file-exists-p filename)))
+       (error "Buffer '%s' is not visiting a file!" name)
+       (let ((new-name (read-file-name "New name: " filename)))
+           (if (get-buffer new-name)
+           (error "A buffer named '%s' already exists!" new-name)
+	   (rename-file filename new-name 1)
+	   (rename-buffer new-name)
+	   (set-visited-file-name new-name)
+	   (set-buffer-modified-p nil)
+	   (message "File '%s' successfully renamed to '%s'"
+                name (file-name-nondirectory new-name)))))))
+  #+end_src
+
+* org-mode
+** org-attach
+   :PROPERTIES:
+   :ID:   q    73ed8db1-9a86-4595-8e18-c94ffba78c4c
+   :END:
+   Set the default method, see [[file:20210117160035--org_attach.org][org-attach]].
+   #+begin_src elisp
+     (setq org-attach-method 'cp)
+   #+end_src
+
+** org-tempo
+   org-tempo allows the use of the old style short cuts
+   such as <s for source blocks and <q for quotes.
+   #+begin_src emacs-lisp
+     (require 'org-tempo)
+   #+end_src
+
+   #+RESULTS:
+   : org-tempo
+
+** org-capture-template
+* org-babel
+** key-bindings
+   #+begin_src emacs-lisp
+     (global-set-key (kbd "C-c o t") 'org-babel-tangle)
+   #+end_src
+* org-roam
+** org-roam dirs
+   To use org-roam all files needs to be within a specific directory.
+   It should also have a designated index file. Currently these are
+   defined to be the following on my system.
+
+   #+begin_src emacs-lisp 
+ ;  (setq org-roam-index-file "~/Documents/roam/index.org")
+ ;  (setq org-roam-directory "~/Documents/roam")
+   #+end_src
+
+** org-roam hook
+   To have org-roam hook it to the ~after-init-hook~.
+
+   #+begin_src emacs-lisp :results none :exports code
+  ;   (add-hook 'after-init-hook 'org-roam-mode)
+   #+end_src
+
+** org-roam encryption
+   It's possible to encrypt all the roam files. If enabled all new
+   files will be encrypted. I've opted not to do so, since it's
+   is not a requirement. Could be good if the roam dir is going to
+   be synced.
+
+   #+begin_src emacs-lisp :exports code
+   ;  (setq org-roam-encrypt-files nil)
+   #+end_src
+
+   #+RESULTS:
+
+** org-roam-capture-templates
+   #+begin_src emacs-lisp
+     (setq org-roam-capture-templates '(                                        ("d" "default" plain (function org-roam--capture-get-point)
+                                                                                 "%?"
+                                                                                 :file-name "%(format-time-string \"%Y%m%d%H%M%S--${slug}\" (current-time) t)"
+                                                                                 :head "#+title: ${title}\n#+author: %(user-login-name)\n#+roam_tags:\n\n* ${title}\n  "
+                                                                                 :unnarrowed t)))
+   #+end_src
+** org-roam key-bindings
+   #+begin_src emacs-lisp :exports code
+;     (global-set-key (kbd "C-c r r") #'org-roam-buffer-toggle-display)
+;     (global-set-key (kbd "C-c r i") #'org-roam-insert)
+;     (global-set-key (kbd "C-c r f") #'org-roam-find-file)
+;     (global-set-key (kbd "C-c r F") #'org-roam-find-file-immediate)
+;     (global-set-key (kbd "C-c r b") #'org-roam-switch-to-buffer)
+;     (global-set-key (kbd "C-c r d") #'org-roam-find-directory)
+;     (global-set-key (kbd "C-c r g") #'org-roam-graph)
+;     (global-set-key (kbd "C-c r c") #'org-roam-capture)
+
+
+     ;;; Recommendation for Windows users for performance
+     ;;; https://github.com/org-roam/org-roam/issues/1289#issuecomment-744046148
+;     (setq org-roam-db-update-method 'immediate)
+   #+end_src
+
+* org-agenda
+  #+begin_src emacs-lisp :exports none
+    ;(add-hook 'after-init-hook 'org-agenda-list)
+  #+end_src
+
+* calfw
+  #+begin_src emacs-lisp
+;    (require 'calfw)
+;    (require 'calfw-ical)
+;    (require 'calfw-org)
+
+;    (setq org-agenda-include-diary t)
+  #+end_src
+
+* mu4e
+  :PROPERTIES:
+  :ID:       74402683-d01f-4892-bc9f-1d4f670da927
+  :END:
+
+  This will only be loaded on my linux machine, and has a seperate configuration file [[file:20210117153005--emacs_config_mu4e.org][Emacs Config mu4e]].
+  #+begin_src emacs-lisp
+;    (when (string-equal system-type "gnu/linux")
+;      (org-babel-load-file "~/Documents/roam/20210117153005--emacs_config_mu4e.org")
+;    )
+  #+end_src
+
+
+* Making a nice dashboard
+  #+begin_src emacs-lisp
+    (require 'dashboard)
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
+    (setq dashboard-startup-banner 'logo)
+    (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (agenda . 10)
+                          (registers . 5)))
+
+    (setq show-week-agenda-p t)
+    (setq dashboard-set-navigator t)
+ #+end_src
+
+* Key-Bindings
+  #+begin_src emacs-lisp
+    (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+    (global-set-key (kbd "C-+") 'text-scale-increase)
+    (global-set-key (kbd "C--") 'text-scale-decrease)
+    (global-set-key [f9] 'deft)
+    (global-set-key [f12] (find-file  "~/.emacs.d/config.org")
+  #+end_src
+
+  #+RESULTS:
+  | find-file | ~/.emacs.d/config.org |
